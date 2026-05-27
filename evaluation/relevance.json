@@ -1,0 +1,76 @@
+{
+  "_comment": "Manual relevance judgments for each query. 'relevant' lists the IDs of documents judged as relevant by the group. 'retrieved' lists the IDs actually returned by buscar() in rank order.",
+  "total_documents": 10,
+  "queries": [
+    {
+      "id": 1,
+      "query": "inteligência artificial",
+      "relevant":  [2, 6, 7, 8, 9, 10],
+      "retrieved": [2, 8],
+      "notes": "Only docs 2 and 8 spell out 'inteligência artificial' in full. Docs 6, 7, 9, 10 use the acronym 'IA', so the FTS query does not match them — classic synonym/abbreviation limitation."
+    },
+    {
+      "id": 2,
+      "query": "banco de dados",
+      "relevant":  [1, 2, 3, 4, 5],
+      "retrieved": [1, 2, 5],
+      "notes": "Doc 3 contains 'bancos' but never 'dados'; doc 4 contains 'dados' but never 'banco'. Both miss the AND requirement of the tsquery, so they are not retrieved despite being relevant."
+    },
+    {
+      "id": 3,
+      "query": "PostgreSQL",
+      "relevant":  [1],
+      "retrieved": [1],
+      "notes": "Perfect match — only doc 1 mentions PostgreSQL."
+    },
+    {
+      "id": 4,
+      "query": "IA",
+      "relevant":  [2, 6, 7, 8, 9, 10],
+      "retrieved": [],
+      "notes": "In Portuguese FTS, 'ia' is a stop word (past imperfect of 'ir'). websearch_to_tsquery returns an empty tsquery, so no documents are retrieved. This illustrates the stop-word/acronym limitation."
+    },
+    {
+      "id": 5,
+      "query": "desempenho",
+      "relevant":  [1, 6, 10],
+      "retrieved": [1, 6],
+      "notes": "Doc 10 is thematically relevant (AI improves medical precision/performance) but uses 'precisão', not 'desempenho', so it is not retrieved."
+    },
+    {
+      "id": 6,
+      "query": "segurança",
+      "relevant":  [1, 5, 9],
+      "retrieved": [1, 9],
+      "notes": "Doc 5 is about data protection and security but uses 'criptografia', 'controle de acesso', 'auditoria' — never the stem of 'segurança' — so it is missed."
+    },
+    {
+      "id": 7,
+      "query": "regulamentação",
+      "relevant":  [5, 9],
+      "retrieved": [5, 9],
+      "notes": "Both docs match perfectly. Doc 9 ranks higher because 'Regulamentação' appears in its title (weight A)."
+    },
+    {
+      "id": 8,
+      "query": "machine learning",
+      "relevant":  [4],
+      "retrieved": [4],
+      "notes": "Perfect match — only doc 4 mentions 'machine learning'."
+    },
+    {
+      "id": 9,
+      "query": "dados",
+      "relevant":  [1, 2, 3, 4, 5],
+      "retrieved": [1, 2, 4, 5, 8],
+      "notes": "Doc 8 ('análise de dados') is retrieved but is not a database document — false positive. Doc 3 (MongoDB) is relevant but never uses 'dados' in its text — false negative."
+    },
+    {
+      "id": 10,
+      "query": "saúde",
+      "relevant":  [10],
+      "retrieved": [10],
+      "notes": "Perfect match — only doc 10 covers healthcare."
+    }
+  ]
+}
