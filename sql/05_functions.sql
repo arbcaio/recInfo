@@ -15,14 +15,14 @@
 
 SET search_path TO grupo;
 
--- ── Query representation ──────────────────────────────────────
+-- -- Query representation --------------------------------------
 
 CREATE OR REPLACE FUNCTION representacao_consulta(consulta TEXT)
 RETURNS tsquery AS $$
     SELECT websearch_to_tsquery('portuguese', consulta);
 $$ LANGUAGE SQL IMMUTABLE;
 
--- ── Search, matching and ranking ──────────────────────────────
+-- -- Search, matching and ranking ------------------------------
 
 CREATE OR REPLACE FUNCTION buscar(consulta TEXT)
 RETURNS TABLE (

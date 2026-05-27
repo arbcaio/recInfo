@@ -8,13 +8,13 @@
 -- =============================================================
 
 
--- ── 1. Schema ─────────────────────────────────────────────────
+-- -- 1. Schema -------------------------------------------------
 
 CREATE SCHEMA IF NOT EXISTS grupo;
 SET search_path TO grupo;
 
 
--- ── 2. Documents table ────────────────────────────────────────
+-- -- 2. Documents table ----------------------------------------
 
 CREATE TABLE IF NOT EXISTS documentos (
     id                      SERIAL PRIMARY KEY,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS documentos (
 );
 
 
--- ── 3. Documents ──────────────────────────────────────────────
+-- -- 3. Documents ----------------------------------------------
 
 INSERT INTO documentos (titulo, conteudo) VALUES
 
@@ -80,14 +80,14 @@ INSERT INTO documentos (titulo, conteudo) VALUES
  'reduzindo custos operacionais.');
 
 
--- ── 4. GIN index ──────────────────────────────────────────────
+-- -- 4. GIN index ----------------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_documentos_fts
     ON documentos
     USING GIN (representacao_documento);
 
 
--- ── 5. Functions ──────────────────────────────────────────────
+-- -- 5. Functions ----------------------------------------------
 
 CREATE OR REPLACE FUNCTION representacao_consulta(consulta TEXT)
 RETURNS tsquery AS $$
@@ -115,12 +115,12 @@ RETURNS TABLE (
 $$ LANGUAGE SQL STABLE;
 
 
--- ── 6. Verify documents ───────────────────────────────────────
+-- -- 6. Verify documents ---------------------------------------
 
 SELECT id, titulo, representacao_documento FROM documentos;
 
 
--- ── 7. Queries ────────────────────────────────────────────────
+-- -- 7. Queries ------------------------------------------------
 
 -- Q1
 SELECT rank, id, titulo FROM buscar('inteligência artificial');
