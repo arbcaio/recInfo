@@ -12,7 +12,7 @@ SET search_path TO grupo;
 
 INSERT INTO documentos (titulo, conteudo) VALUES
 
--- ── DATABASE SYSTEMS ──────────────────────────────────────────
+-- -- DATABASE SYSTEMS ------------------------------------------
 
 (
     'Nova versão do PostgreSQL melhora desempenho',
@@ -49,7 +49,7 @@ INSERT INTO documentos (titulo, conteudo) VALUES
     'controle de acesso, auditoria e criptografia.'
 ),
 
--- ── ARTIFICIAL INTELLIGENCE ───────────────────────────────────
+-- -- ARTIFICIAL INTELLIGENCE -----------------------------------
 
 (
     'OpenAI lança novos modelos mais eficientes',

@@ -18,7 +18,7 @@ param(
     [string]$DbPort     = "5432"
 )
 
-# ── Auto-elevar para Administrador se necessario ──────────────
+# -- Auto-elevar para Administrador se necessario --------------
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
         [Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "Elevando para Administrador..." -ForegroundColor Yellow
@@ -32,7 +32,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 $ErrorActionPreference = "Stop"
 
-# ── Cores ──────────────────────────────────────────────────────
+# -- Cores ------------------------------------------------------
 function Write-Step { param($msg) Write-Host "`n==> $msg" -ForegroundColor Cyan }
 function Write-Ok   { param($msg) Write-Host "    [OK] $msg" -ForegroundColor Green }
 function Write-Warn { param($msg) Write-Host "    [AVISO] $msg" -ForegroundColor Yellow }
@@ -43,7 +43,7 @@ function Write-Fail {
     exit 1
 }
 
-# ── 1. Localizar psql ─────────────────────────────────────────
+# -- 1. Localizar psql -----------------------------------------
 Write-Step "Verificando PostgreSQL..."
 
 function Find-Psql {
@@ -97,14 +97,14 @@ $psqlDir = Split-Path $psqlPath
 if ($env:PATH -notlike "*$psqlDir*") { $env:PATH = "$psqlDir;$env:PATH" }
 Write-Ok "psql encontrado: $psqlPath"
 
-# ── 2. Pedir a senha ──────────────────────────────────────────
+# -- 2. Pedir a senha ------------------------------------------
 Write-Step "Informe a senha do usuario '$DbUser':"
 $pgPass = Read-Host -AsSecureString
 $env:PGPASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
     [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pgPass)
 )
 
-# ── 3. Testar conexao (usa o proprio DbName) ──────────────────
+# -- 3. Testar conexao (usa o proprio DbName) ------------------
 Write-Step "Testando conexao com '$DbHost'..."
 
 $connTest = & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d $DbName -tAc "SELECT 1;" 2>&1
@@ -113,7 +113,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Ok "Conexao OK."
 
-# ── 4. Criar banco se for execucao local e nao existir ────────
+# -- 4. Criar banco se for execucao local e nao existir --------
 if ($DbHost -eq "localhost" -or $DbHost -eq "127.0.0.1") {
     $dbExists = & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d $DbName -tAc `
         "SELECT COUNT(*) FROM pg_database WHERE datname='$DbName';" 2>&1
@@ -125,7 +125,7 @@ if ($DbHost -eq "localhost" -or $DbHost -eq "127.0.0.1") {
     }
 }
 
-# ── 5. Preparar o main.sql ────────────────────────────────────
+# -- 5. Preparar o main.sql ------------------------------------
 Write-Step "Configurando schema '$SchemaName'..."
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -138,7 +138,7 @@ if (-not (Test-Path $mainSql)) { Write-Fail "Arquivo nao encontrado: $mainSql" }
     Set-Content $tempSql -Encoding UTF8
 Write-Ok "Schema configurado: $SchemaName"
 
-# ── 6. Executar o script SQL ──────────────────────────────────
+# -- 6. Executar o script SQL ----------------------------------
 Write-Step "Executando main.sql no banco '$DbName' em '$DbHost'..."
 
 & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d $DbName -f $tempSql
@@ -146,7 +146,7 @@ Write-Step "Executando main.sql no banco '$DbName' em '$DbHost'..."
 if ($LASTEXITCODE -ne 0) { Write-Fail "Erro ao executar o script SQL. Verifique as mensagens acima." }
 Write-Ok "Script executado com sucesso!"
 
-# ── 7. Metricas (Python) ──────────────────────────────────────
+# -- 7. Metricas (Python) --------------------------------------
 Write-Step "Calculando metricas (Python)..."
 
 $python = Get-Command python -ErrorAction SilentlyContinue
@@ -157,7 +157,7 @@ if (-not $python) {
     Write-Ok "Metricas salvas em evaluation\results.csv"
 }
 
-# ── 8. Limpar ─────────────────────────────────────────────────
+# -- 8. Limpar -------------------------------------------------
 $env:PGPASSWORD = ""
 Remove-Item $tempSql -ErrorAction SilentlyContinue
 

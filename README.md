@@ -35,24 +35,24 @@ O sistema realiza todas as etapas clássicas de um motor de busca:
 
 ```
 recInfo/
-├── sql/
-│   ├── 01_schema.sql           # Cria o schema do grupo
-│   ├── 02_table_documents.sql  # Cria a tabela com coluna tsvector gerada
-│   ├── 03_insert_documents.sql # Insere os 10 documentos
-│   ├── 04_index.sql            # Cria o índice GIN invertido
-│   ├── 05_functions.sql        # Funções representacao_consulta() e buscar()
-│   ├── 06_queries.sql          # Executa as 10 consultas
-│   └── main.sql                # Script único (tudo em um) para o pgAdmin
-├── evaluation/
-│   ├── relevance.json          # Julgamentos de relevância manuais
-│   ├── evaluate.py             # Script Python que calcula as métricas
-│   └── results.csv             # Saída gerada pelo evaluate.py
-├── report/
-│   └── report.md               # Relatório completo com análise de desempenho
-├── setup.ps1                   # Script PowerShell de execução automática
-├── .gitignore
-├── requirements.txt
-└── README.md
+├-- sql/
+│   ├-- 01_schema.sql           # Cria o schema do grupo
+│   ├-- 02_table_documents.sql  # Cria a tabela com coluna tsvector gerada
+│   ├-- 03_insert_documents.sql # Insere os 10 documentos
+│   ├-- 04_index.sql            # Cria o índice GIN invertido
+│   ├-- 05_functions.sql        # Funções representacao_consulta() e buscar()
+│   ├-- 06_queries.sql          # Executa as 10 consultas
+│   └-- main.sql                # Script único (tudo em um) para o pgAdmin
+├-- evaluation/
+│   ├-- relevance.json          # Julgamentos de relevância manuais
+│   ├-- evaluate.py             # Script Python que calcula as métricas
+│   └-- results.csv             # Saída gerada pelo evaluate.py
+├-- report/
+│   └-- report.md               # Relatório completo com análise de desempenho
+├-- setup.ps1                   # Script PowerShell de execução automática
+├-- .gitignore
+├-- requirements.txt
+└-- README.md
 ```
 
 ---

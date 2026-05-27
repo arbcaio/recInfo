@@ -16,7 +16,7 @@ import json
 import csv
 import os
 
-# ── Load relevance judgments ──────────────────────────────────
+# -- Load relevance judgments ----------------------------------
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 RELEVANCE_FILE = os.path.join(SCRIPT_DIR, "relevance.json")
@@ -26,7 +26,7 @@ with open(RELEVANCE_FILE, encoding="utf-8") as f:
     data = json.load(f)
 
 
-# ── Metric functions ──────────────────────────────────────────
+# -- Metric functions ------------------------------------------
 
 def precision(relevant: set, retrieved: list) -> float:
     """P = |relevant ∩ retrieved| / |retrieved|"""
@@ -49,7 +49,7 @@ def f_measure(p: float, r: float) -> float:
     return 2 * p * r / (p + r)
 
 
-# ── Compute metrics ───────────────────────────────────────────
+# -- Compute metrics -------------------------------------------
 
 rows = []
 
@@ -77,7 +77,7 @@ for q in data["queries"]:
     })
 
 
-# ── Print formatted table ─────────────────────────────────────
+# -- Print formatted table -------------------------------------
 
 HEADER = (
     f"{'#':>2}  {'Query':<28}  "
@@ -112,7 +112,7 @@ print(
 print(SEP)
 
 
-# ── Write CSV ─────────────────────────────────────────────────
+# -- Write CSV -------------------------------------------------
 
 with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as csvfile:
     fieldnames = [
