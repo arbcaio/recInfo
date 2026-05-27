@@ -36,7 +36,7 @@ O sistema realiza todas as etapas clássicas de um motor de busca:
 ```
 recInfo/
 ├-- sql/
-│   ├-- 01_schema.sql           # Cria o schema do grupo
+│   ├-- 01_schema.sql           # Cria o esquema do grupo
 │   ├-- 02_table_documents.sql  # Cria a tabela com coluna tsvector gerada
 │   ├-- 03_insert_documents.sql # Insere os 10 documentos
 │   ├-- 04_index.sql            # Cria o índice GIN invertido
@@ -59,7 +59,7 @@ recInfo/
 
 ##  Execução via Script (Recomendado)
 
-O arquivo `setup.ps1` automatiza toda a instalação e execução - instala o PostgreSQL se necessário, configura o schema e roda as métricas.
+O arquivo `setup.ps1` automatiza toda a instalação e execução - instala o PostgreSQL se necessário, configura o esquema e roda as métricas.
 
 ### No servidor da UFPE
 
@@ -94,7 +94,7 @@ Quando solicitado, informe a senha do usuário `postgres` definida na instalaç�
 
 | Parâmetro | Padrão | Descrição |
 |-----------|--------|-----------|
-| `-SchemaName` | `grupo1` | Nome do schema criado no banco |
+| `-esquemaName` | `grupo1` | Nome do esquema criado no banco |
 | `-DbName` | `disciplinas` | Nome do banco de dados |
 | `-DbUser` | `postgres` | Usuário do PostgreSQL |
 | `-DbHost` | `localhost` | Endereço do servidor |
@@ -131,9 +131,9 @@ Quando solicitado, informe a senha do usuário `postgres` definida na instalaç�
 
 ---
 
-#### Passo 2 - Renomear o schema no script
+#### Passo 2 - Renomear o esquema no script
 
->  Cada grupo deve usar um schema exclusivo para não conflitar com os demais.
+>  Cada grupo deve usar um esquema exclusivo para não conflitar com os demais.
 
 Abra `sql/main.sql` e use Localizar e Substituir (`Ctrl+H`):
 - Localizar: `grupo`
@@ -164,18 +164,6 @@ CREATE FUNCTION
 ```bash
 python evaluation/evaluate.py
 ```
-
----
-
-###  Solução de Problemas
-
-| Problema | Causa provável | Solução |
-|----------|---------------|---------|
-| `could not connect to server` | Fora da rede UFPE | Conecte à VPN da UFPE |
-| `schema "grupo" already exists` | Script rodado sem renomear | Substitua `grupo` pelo nome do seu grupo no `main.sql` |
-| `function buscar() does not exist` | Script não foi executado por completo | Rode `main.sql` inteiro (`F5` sem seleção) |
-| `ERROR: duplicate key value` | Script rodado mais de uma vez | Execute `DROP SCHEMA grupo1 CASCADE;` e rode novamente |
-| `buscar('IA')` retorna 0 resultados | `ia` é *stop word* em português no FTS | Comportamento esperado - documentado no relatório |
 
 ---
 
