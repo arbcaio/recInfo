@@ -1,40 +1,37 @@
 # Recuperação da Informação em Bancos de Dados Relacionais
 
-> Trabalho prático da disciplina **Recuperação de Informação** — implementação de um sistema de busca usando o módulo Full Text Search (FTS) nativo do PostgreSQL.
+> Trabalho prático da disciplina **Recuperação de Informação** - implementação de um sistema de busca usando o módulo Full Text Search (FTS) nativo do PostgreSQL.
 
 ---
 
-## 👥 Grupo
+##  Grupo
 
-| Nome | Matrícula |
-|------|-----------|
-| Agenor Luiz | — |
-| Caio Braga | — |
-| Dayvid Willams | — |
-| Luiz Anjos | — |
-| Maria Luiza | — |
+Agenor Luiz
+Caio Braga
+Dayvid Willams
+Luiz Anjos
+Maria Luiza
 
 **Professor:** Prof. Dr. Bruno Tenório Ávila  
-**Disciplina:** Recuperação de Informação — UFPE  
-**Entrega:** 01/06/2026 até às 19:00
+**Disciplina:** Recuperação de Informação - UFPE  
 
 ---
 
-## 📋 Descrição
+##  Descrição
 
 O objetivo deste trabalho é criar um **sistema de recuperação da informação** dentro de um banco de dados relacional PostgreSQL, explorando o recurso nativo de *Full Text Search* (FTS).
 
 O sistema realiza todas as etapas clássicas de um motor de busca:
 
-1. **Aquisição** — 10 documentos em português inseridos diretamente no banco.
-2. **Representação** — cada documento é indexado como um `tsvector` com pesos diferenciados por campo (título = peso A, conteúdo = peso B).
-3. **Índice invertido** — criação de um índice GIN (*Generalized Inverted Index*) sobre o `tsvector`.
-4. **Recuperação** — função `buscar()` que converte a consulta em `tsquery`, casa com os documentos via operador `@@` e os ordena por `ts_rank`.
-5. **Avaliação** — cálculo de Precisão, Cobertura (Recall) e F-measure para cada uma das 10 consultas realizadas.
+1. **Aquisição** - 10 documentos em português inseridos diretamente no banco.
+2. **Representação** - cada documento é indexado como um `tsvector` com pesos diferenciados por campo (título = peso A, conteúdo = peso B).
+3. **Índice invertido** - criação de um índice GIN (*Generalized Inverted Index*) sobre o `tsvector`.
+4. **Recuperação** - função `buscar()` que converte a consulta em `tsquery`, casa com os documentos via operador `@@` e os ordena por `ts_rank`.
+5. **Avaliação** - cálculo de Precisão, Cobertura (Recall) e F-measure para cada uma das 10 consultas realizadas.
 
 ---
 
-## 🗂️ Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 recInfo/
@@ -60,9 +57,9 @@ recInfo/
 
 ---
 
-## 🚀 Execução via Script (Recomendado)
+##  Execução via Script (Recomendado)
 
-O arquivo `setup.ps1` automatiza toda a instalação e execução — instala o PostgreSQL se necessário, configura o schema e roda as métricas.
+O arquivo `setup.ps1` automatiza toda a instalação e execução - instala o PostgreSQL se necessário, configura o schema e roda as métricas.
 
 ### No servidor da UFPE
 
@@ -105,7 +102,7 @@ Quando solicitado, informe a senha do usuário `postgres` definida na instalaç�
 
 ---
 
-## 🔧 Execução Manual (pgAdmin)
+##  Execução Manual (pgAdmin)
 
 ### Pré-requisitos
 
@@ -115,7 +112,7 @@ Quando solicitado, informe a senha do usuário `postgres` definida na instalaç�
 
 ---
 
-#### Passo 1 — Criar o servidor no pgAdmin
+#### Passo 1 - Criar o servidor no pgAdmin
 
 1. Abra o **pgAdmin 4**.
 2. No painel esquerdo, clique com o botão direito em **Servers** -> **Register -> Server…**
@@ -134,9 +131,9 @@ Quando solicitado, informe a senha do usuário `postgres` definida na instalaç�
 
 ---
 
-#### Passo 2 — Renomear o schema no script
+#### Passo 2 - Renomear o schema no script
 
-> ⚠️ Cada grupo deve usar um schema exclusivo para não conflitar com os demais.
+>  Cada grupo deve usar um schema exclusivo para não conflitar com os demais.
 
 Abra `sql/main.sql` e use Localizar e Substituir (`Ctrl+H`):
 - Localizar: `grupo`
@@ -144,7 +141,7 @@ Abra `sql/main.sql` e use Localizar e Substituir (`Ctrl+H`):
 
 ---
 
-#### Passo 3 — Executar o script
+#### Passo 3 - Executar o script
 
 1. No pgAdmin, expanda **UFPE -> Databases -> disciplinas**.
 2. Clique com o botão direito em **disciplinas** -> **Query Tool**.
@@ -162,7 +159,7 @@ CREATE FUNCTION
 
 ---
 
-#### Passo 4 — Calcular as métricas (Python)
+#### Passo 4 - Calcular as métricas (Python)
 
 ```bash
 python evaluation/evaluate.py
@@ -170,7 +167,7 @@ python evaluation/evaluate.py
 
 ---
 
-### ❗ Solução de Problemas
+###  Solução de Problemas
 
 | Problema | Causa provável | Solução |
 |----------|---------------|---------|
@@ -178,11 +175,11 @@ python evaluation/evaluate.py
 | `schema "grupo" already exists` | Script rodado sem renomear | Substitua `grupo` pelo nome do seu grupo no `main.sql` |
 | `function buscar() does not exist` | Script não foi executado por completo | Rode `main.sql` inteiro (`F5` sem seleção) |
 | `ERROR: duplicate key value` | Script rodado mais de uma vez | Execute `DROP SCHEMA grupo1 CASCADE;` e rode novamente |
-| `buscar('IA')` retorna 0 resultados | `ia` é *stop word* em português no FTS | Comportamento esperado — documentado no relatório |
+| `buscar('IA')` retorna 0 resultados | `ia` é *stop word* em português no FTS | Comportamento esperado - documentado no relatório |
 
 ---
 
-## 📊 Resumo dos Resultados
+##  Resumo dos Resultados
 
 | # | Consulta | Precisão | Cobertura | F-measure |
 |:-:|----------|:--------:|:---------:|:---------:|
@@ -200,13 +197,13 @@ python evaluation/evaluate.py
 
 ---
 
-## 🔑 Conceitos-chave
+##  Conceitos-chave
 
 | Termo | Descrição |
 |-------|-----------|
 | `tsvector` | Representação interna do documento: radicais ordenados + pesos |
 | `tsquery` | Representação da consulta em radicais |
-| `GIN` | Índice invertido generalizado — busca em O(log N + K) |
+| `GIN` | Índice invertido generalizado - busca em O(log N + K) |
 | `ts_rank` | Função de pontuação (frequência + peso por campo) |
 | `setweight` | Atribui peso A (título) ou B (conteúdo) aos tokens |
 | Precisão | \|Relevantes ∩ Retornados\| / \|Retornados\| |
@@ -215,9 +212,9 @@ python evaluation/evaluate.py
 
 ---
 
-## 📚 Referências
+##  Referências
 
-- [PostgreSQL — Chapter 12: Full Text Search](https://www.postgresql.org/docs/current/textsearch.html)
+- [PostgreSQL - Chapter 12: Full Text Search](https://www.postgresql.org/docs/current/textsearch.html)
 - [Apache Lucene](https://lucene.apache.org/)
 - [Elasticsearch](https://www.elastic.co/)
 - [Apache Solr](https://solr.apache.org/)
