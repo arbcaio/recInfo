@@ -280,4 +280,3 @@ A consulta `'dados'` retorna o doc 8 ("análise de *dados*" no contexto de IA), 
 O sistema de recuperação da informação implementado com o PostgreSQL FTS demonstrou alta **precisão** (0,88 em média) e **cobertura** moderada (0,71 em média), resultando em um **F-measure médio de 0,76**.
 
 As principais limitações identificadas estão relacionadas ao tratamento de acrônimos (stop words), à ausência de expansão por sinônimos e à dependência de co-ocorrência exata de termos compostos. Essas limitações são conhecidas do FTS relacional e, para contextos de maior escala ou vocabulário mais rico, motores especializados como Elasticsearch (baseado no Apache Lucene) seriam mais adequados.
-                                    

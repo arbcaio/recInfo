@@ -2,12 +2,12 @@
 -- 05_functions.sql
 -- Two helper functions that implement the retrieval pipeline:
 --
---   representacao_consulta(text) → tsquery
+--   representacao_consulta(text) -> tsquery
 --     Converts a free-text query into a tsquery using the
 --     Portuguese lexeme configuration.  websearch_to_tsquery
 --     also supports Google-style operators: -word, "phrase".
 --
---   buscar(text) → TABLE
+--   buscar(text) -> TABLE
 --     Matches documents against the query via the @@ operator,
 --     scores them with ts_rank (TF-like + setweight bonuses),
 --     and returns results ordered by rank descending.
