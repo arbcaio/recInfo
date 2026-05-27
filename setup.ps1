@@ -4,9 +4,8 @@
 # de recuperação da informação localmente.
 #
 # Como usar:
-#   1. Abra o PowerShell como Administrador
-#   2. Execute:  .\setup.ps1
-#   3. Quando pedido, informe a senha do postgres
+#   Abra o PowerShell e execute:  .\setup.ps1
+#   O script pede elevação de administrador automaticamente.
 # =============================================================
 
 param(
@@ -17,29 +16,86 @@ param(
     [string]$DbPort     = "5432"
 )
 
+# ── Auto-elevar para Administrador se necessario ──────────────
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+        [Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "Elevando para Administrador..." -ForegroundColor Yellow
+    $psArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" +
+              " -SchemaName `"$SchemaName`" -DbName `"$DbName`"" +
+              " -DbUser `"$DbUser`" -DbHost `"$DbHost`" -DbPort `"$DbPort`""
+    Start-Process powershell -ArgumentList $psArgs -Verb RunAs
+    exit
+}
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 $ErrorActionPreference = "Stop"
 
 # ── Cores ──────────────────────────────────────────────────────
-function Write-Step  { param($msg) Write-Host "`n==> $msg" -ForegroundColor Cyan }
-function Write-Ok    { param($msg) Write-Host "    [OK] $msg" -ForegroundColor Green }
-function Write-Warn  { param($msg) Write-Host "    [AVISO] $msg" -ForegroundColor Yellow }
-function Write-Fail  { param($msg) Write-Host "    [ERRO] $msg" -ForegroundColor Red; exit 1 }
+function Write-Step { param($msg) Write-Host "`n==> $msg" -ForegroundColor Cyan }
+function Write-Ok   { param($msg) Write-Host "    [OK] $msg" -ForegroundColor Green }
+function Write-Warn { param($msg) Write-Host "    [AVISO] $msg" -ForegroundColor Yellow }
+function Write-Fail { param($msg) Write-Host "    [ERRO] $msg" -ForegroundColor Red; Read-Host "Pressione Enter para fechar"; exit 1 }
 
-# ── 1. Verificar / instalar PostgreSQL ────────────────────────
+# ── 1. Localizar psql ─────────────────────────────────────────
 Write-Step "Verificando PostgreSQL..."
 
-$psql = Get-Command psql -ErrorAction SilentlyContinue
-if (-not $psql) {
+function Find-Psql {
+    $found = Get-Command psql -ErrorAction SilentlyContinue
+    if ($found) { return $found.Source }
+
+    $roots = @(
+        "$env:ProgramFiles\PostgreSQL",
+        "${env:ProgramFiles(x86)}\PostgreSQL",
+        "C:\PostgreSQL"
+    )
+    foreach ($root in $roots) {
+        if (Test-Path $root) {
+            $bin = Get-ChildItem "$root\*\bin\psql.exe" -ErrorAction SilentlyContinue |
+                   Sort-Object FullName -Descending | Select-Object -First 1
+            if ($bin) { return $bin.FullName }
+        }
+    }
+    return $null
+}
+
+$psqlPath = Find-Psql
+
+if (-not $psqlPath) {
     Write-Warn "psql nao encontrado. Tentando instalar via winget..."
-    winget install --id PostgreSQL.PostgreSQL -e --accept-source-agreements --accept-package-agreements
-    # Atualiza o PATH para encontrar o psql recém-instalado
+    $wingetIds = @(
+        "PostgreSQL.PostgreSQL.17",
+        "PostgreSQL.PostgreSQL.16",
+        "PostgreSQL.PostgreSQL.15",
+        "PostgreSQL.PostgreSQL"
+    )
+    $installed = $false
+    foreach ($id in $wingetIds) {
+        Write-Host "    Tentando: $id" -ForegroundColor Gray
+        winget install --id $id -e --accept-source-agreements --accept-package-agreements
+        if ($LASTEXITCODE -eq 0) { $installed = $true; break }
+    }
+
+    if (-not $installed) {
+        Write-Host ""
+        Write-Host "  Nao foi possivel instalar automaticamente." -ForegroundColor Yellow
+        Write-Host "  Baixe e instale manualmente:" -ForegroundColor Yellow
+        Write-Host "  https://www.postgresql.org/download/windows/" -ForegroundColor White
+        Write-Host "  Depois rode este script novamente." -ForegroundColor Yellow
+        Read-Host "Pressione Enter para fechar"
+        exit 1
+    }
+
+    # Atualiza PATH na sessao atual apos instalacao
     $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + $env:PATH
-    $psql = Get-Command psql -ErrorAction SilentlyContinue
-    if (-not $psql) {
-        Write-Fail "psql ainda nao encontrado. Adicione a pasta bin do PostgreSQL ao PATH e rode novamente."
+    $psqlPath = Find-Psql
+    if (-not $psqlPath) {
+        Write-Fail "psql nao encontrado apos instalacao. Feche e reabra o PowerShell e tente novamente."
     }
 }
-Write-Ok "psql encontrado: $($psql.Source)"
+
+$psqlDir = Split-Path $psqlPath
+if ($env:PATH -notlike "*$psqlDir*") { $env:PATH = "$psqlDir;$env:PATH" }
+Write-Ok "psql encontrado: $psqlPath"
 
 # ── 2. Pedir a senha do postgres ──────────────────────────────
 Write-Step "Informe a senha do usuario '$DbUser' (definida na instalacao do PostgreSQL):"
@@ -51,12 +107,16 @@ $env:PGPASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
 # ── 3. Criar banco de dados se nao existir ────────────────────
 Write-Step "Verificando banco de dados '$DbName'..."
 
-$exists = psql -h $DbHost -p $DbPort -U $DbUser -tAc `
+$exists = & $psqlPath -h $DbHost -p $DbPort -U $DbUser -tAc `
     "SELECT 1 FROM pg_database WHERE datname='$DbName';" 2>&1
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Fail "Nao foi possivel conectar ao PostgreSQL. Verifique se o servico esta rodando e a senha esta correta."
+}
 
 if ($exists -notmatch "1") {
     Write-Warn "Banco '$DbName' nao existe. Criando..."
-    psql -h $DbHost -p $DbPort -U $DbUser -c "CREATE DATABASE $DbName;" postgres
+    & $psqlPath -h $DbHost -p $DbPort -U $DbUser -c "CREATE DATABASE $DbName;" postgres
     Write-Ok "Banco '$DbName' criado."
 } else {
     Write-Ok "Banco '$DbName' ja existe."
@@ -65,21 +125,22 @@ if ($exists -notmatch "1") {
 # ── 4. Preparar o main.sql com o schema correto ───────────────
 Write-Step "Configurando schema '$SchemaName' no script SQL..."
 
-$scriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
-$mainSql    = Join-Path $scriptDir "sql\main.sql"
-$tempSql    = Join-Path $env:TEMP "recinfo_main_$SchemaName.sql"
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$mainSql   = Join-Path $scriptDir "sql\main.sql"
+$tempSql   = Join-Path $env:TEMP "recinfo_main_$SchemaName.sql"
 
 if (-not (Test-Path $mainSql)) {
     Write-Fail "Arquivo nao encontrado: $mainSql"
 }
 
-(Get-Content $mainSql -Raw) -replace '\bgrupo\b', $SchemaName | Set-Content $tempSql -Encoding UTF8
+(Get-Content $mainSql -Raw -Encoding UTF8) -replace '\bgrupo\b', $SchemaName |
+    Set-Content $tempSql -Encoding UTF8
 Write-Ok "Script temporario criado em: $tempSql"
 
 # ── 5. Executar o script SQL ──────────────────────────────────
 Write-Step "Executando main.sql no banco '$DbName'..."
 
-psql -h $DbHost -p $DbPort -U $DbUser -d $DbName -f $tempSql
+& $psqlPath -h $DbHost -p $DbPort -U $DbUser -d $DbName -f $tempSql
 
 if ($LASTEXITCODE -ne 0) {
     Write-Fail "Erro ao executar o script SQL. Verifique as mensagens acima."
@@ -91,20 +152,21 @@ Write-Step "Calculando metricas de avaliacao (Python)..."
 
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (-not $python) {
-    Write-Warn "Python nao encontrado. Pule esta etapa ou instale em python.org/downloads"
+    Write-Warn "Python nao encontrado. Instale em python.org/downloads e rode 'python evaluation\evaluate.py' manualmente."
 } else {
     $evalScript = Join-Path $scriptDir "evaluation\evaluate.py"
     python $evalScript
     Write-Ok "Metricas calculadas. Resultados em evaluation\results.csv"
 }
 
-# ── 7. Limpar senha da memoria ────────────────────────────────
+# ── 7. Limpar ─────────────────────────────────────────────────
 $env:PGPASSWORD = ""
 Remove-Item $tempSql -ErrorAction SilentlyContinue
 
 Write-Host "`n============================================================" -ForegroundColor Green
-Write-Host "  Tudo pronto! Sistema executado no schema '$SchemaName'." -ForegroundColor Green
-Write-Host "  Para testar no pgAdmin, execute:" -ForegroundColor Green
+Write-Host "  Tudo pronto! Sistema no schema '$SchemaName'." -ForegroundColor Green
+Write-Host "  Para testar no pgAdmin execute:" -ForegroundColor Green
 Write-Host "    SET search_path TO $SchemaName;" -ForegroundColor White
 Write-Host "    SELECT rank, id, titulo FROM buscar('banco de dados');" -ForegroundColor White
 Write-Host "============================================================`n" -ForegroundColor Green
+Read-Host "Pressione Enter para fechar"
