@@ -1,38 +1,40 @@
 # Recuperação da Informação em Bancos de Dados Relacionais
 
-> Trabalho prático da disciplina **Recuperação de Informação** - implementação de um sistema de busca usando o módulo Full Text Search (FTS) nativo do PostgreSQL.
+> Trabalho prático da disciplina **Recuperação de Informação** — implementação de um sistema de busca usando o módulo Full Text Search (FTS) nativo do PostgreSQL.
 
 ---
 
-##  Grupo
+## 👥 Grupo
 
-- Agenor Luiz
-- Caio Braga
-- Dayvid Willams
-- Luiz Anjos
-- Maria Luiza
+| Nome | Matrícula |
+|------|-----------|
+| Agenor Luiz | — |
+| Caio Braga | — |
+| Dayvid Willams | — |
+| Luiz Anjos | — |
+| Maria Luiza | — |
 
 **Professor:** Prof. Dr. Bruno Tenório Ávila  
-**Disciplina:** Recuperação de Informação - UFPE  
+**Disciplina:** Recuperação de Informação — UFPE  
 **Entrega:** 01/06/2026 até às 19:00
 
 ---
 
-##  Descrição
+## 📋 Descrição
 
 O objetivo deste trabalho é criar um **sistema de recuperação da informação** dentro de um banco de dados relacional PostgreSQL, explorando o recurso nativo de *Full Text Search* (FTS).
 
 O sistema realiza todas as etapas clássicas de um motor de busca:
 
-1. **Aquisição** - 10 documentos em português inseridos diretamente no banco.
-2. **Representação** - cada documento é indexado como um `tsvector` com pesos diferenciados por campo (título = peso A, conteúdo = peso B).
-3. **Índice invertido** - criação de um índice GIN (*Generalized Inverted Index*) sobre o `tsvector`.
-4. **Recuperação** - função `buscar()` que converte a consulta em `tsquery`, casa com os documentos via operador `@@` e os ordena por `ts_rank`.
-5. **Avaliação** - cálculo de Precisão, Cobertura (Recall) e F-measure para cada uma das 10 consultas realizadas.
+1. **Aquisição** — 10 documentos em português inseridos diretamente no banco.
+2. **Representação** — cada documento é indexado como um `tsvector` com pesos diferenciados por campo (título = peso A, conteúdo = peso B).
+3. **Índice invertido** — criação de um índice GIN (*Generalized Inverted Index*) sobre o `tsvector`.
+4. **Recuperação** — função `buscar()` que converte a consulta em `tsquery`, casa com os documentos via operador `@@` e os ordena por `ts_rank`.
+5. **Avaliação** — cálculo de Precisão, Cobertura (Recall) e F-measure para cada uma das 10 consultas realizadas.
 
 ---
 
-##  Estrutura do Projeto
+## 🗂️ Estrutura do Projeto
 
 ```
 recInfo/
@@ -57,18 +59,19 @@ recInfo/
 
 ---
 
-##  Passo a Passo para Executar
+## 🚀 Passo a Passo para Executar
 
 ### Pré-requisitos
 
 - **pgAdmin 4** instalado → [pgadmin.org/download](https://www.pgadmin.org/download/)
 - **Python 3.8+** instalado → [python.org/downloads](https://www.python.org/downloads/) *(somente para calcular as métricas localmente)*
+- Acesso à rede da UFPE (ou VPN, se estiver fora do campus)
 
 ---
 
-### Parte 1 - Executar o sistema no PostgreSQL (pgAdmin)
+### Parte 1 — Executar o sistema no PostgreSQL (pgAdmin)
 
-#### Passo 1 - Abrir o pgAdmin e criar o servidor
+#### Passo 1 — Abrir o pgAdmin e criar o servidor
 
 1. Abra o **pgAdmin 4**.
 2. No painel esquerdo (*Browser*), clique com o botão direito em **Servers** → **Register → Server…**
@@ -88,9 +91,9 @@ recInfo/
 
 ---
 
-#### Passo 2 - Renomear o schema no script
+#### Passo 2 — Renomear o schema no script
 
->  Cada grupo deve usar um schema exclusivo para não conflitar com os demais.
+> ⚠️ Cada grupo deve usar um schema exclusivo para não conflitar com os demais.
 
 1. Abra o arquivo `sql/main.sql` em qualquer editor de texto (VS Code, Notepad++, etc.).
 2. Use o **Localizar e Substituir** (`Ctrl+H` no VS Code):
@@ -100,7 +103,7 @@ recInfo/
 
 ---
 
-#### Passo 3 - Abrir o Query Tool
+#### Passo 3 — Abrir o Query Tool
 
 1. No painel esquerdo do pgAdmin, expanda: **UFPE → Databases → disciplinas**.
 2. Clique com o botão direito em **disciplinas** → **Query Tool**.
@@ -108,12 +111,12 @@ recInfo/
 
 ---
 
-#### Passo 4 - Carregar e executar o script
+#### Passo 4 — Carregar e executar o script
 
-1. No Query Tool, clique no ícone de pasta  (*Open File*) ou use `Ctrl+O`.
+1. No Query Tool, clique no ícone de pasta 📂 (*Open File*) ou use `Ctrl+O`.
 2. Navegue até a pasta do projeto e selecione **`sql/main.sql`**.
-3. Clique em ** Execute / Refresh** (ou pressione `F5`) para rodar o script inteiro.
-4. Acompanhe o painel de *Messages* na parte inferior - você deve ver mensagens como:
+3. Clique em **▶ Execute / Refresh** (ou pressione `F5`) para rodar o script inteiro.
+4. Acompanhe o painel de *Messages* na parte inferior — você deve ver mensagens como:
    ```
    CREATE SCHEMA
    CREATE TABLE
@@ -125,7 +128,7 @@ recInfo/
 
 ---
 
-#### Passo 5 - Verificar os documentos indexados
+#### Passo 5 — Verificar os documentos indexados
 
 Após a execução, rode manualmente a query abaixo para confirmar que os 10 documentos foram inseridos e o `tsvector` foi gerado corretamente:
 
@@ -141,7 +144,7 @@ A coluna `representacao_documento` deve exibir os radicais e seus pesos, por exe
 
 ---
 
-#### Passo 6 - Executar as consultas individualmente
+#### Passo 6 — Executar as consultas individualmente
 
 As 10 consultas são executadas automaticamente pelo `main.sql`. Para rodá-las uma a uma, use o arquivo `sql/06_queries.sql` ou copie diretamente no Query Tool:
 
@@ -160,13 +163,13 @@ SELECT rank, id, titulo FROM buscar('dados');
 SELECT rank, id, titulo FROM buscar('saúde');
 ```
 
->  No pgAdmin, selecione **apenas uma linha** e pressione `F5` para executar somente aquela consulta e ver seu resultado separadamente.
+> 💡 No pgAdmin, selecione **apenas uma linha** e pressione `F5` para executar somente aquela consulta e ver seu resultado separadamente.
 
 ---
 
-### Parte 2 - Calcular as métricas (Python)
+### Parte 2 — Calcular as métricas (Python)
 
-#### Passo 7 - Rodar o script de avaliação
+#### Passo 7 — Rodar o script de avaliação
 
 Abra um terminal na pasta raiz do projeto e execute:
 
@@ -199,7 +202,7 @@ Os resultados também são salvos em `evaluation/results.csv`.
 
 ---
 
-###  Solução de Problemas
+### ❗ Solução de Problemas
 
 | Problema | Causa provável | Solução |
 |----------|---------------|---------|
@@ -207,11 +210,11 @@ Os resultados também são salvos em `evaluation/results.csv`.
 | `schema "grupo" already exists` | Script rodado sem renomear | Substitua `grupo` pelo nome do seu grupo no `main.sql` |
 | `function buscar() does not exist` | Script não foi executado por completo | Rode `main.sql` inteiro (`F5` sem seleção) |
 | `ERROR: duplicate key value` | Script rodado mais de uma vez | Execute `DROP SCHEMA grupo1 CASCADE;` e rode novamente |
-| `buscar('IA')` retorna 0 resultados | `ia` é *stop word* em português no FTS | Comportamento esperado - documentado no relatório |
+| `buscar('IA')` retorna 0 resultados | `ia` é *stop word* em português no FTS | Comportamento esperado — documentado no relatório |
 
 ---
 
-##  Resumo dos Resultados
+## 📊 Resumo dos Resultados
 
 | # | Consulta | Precisão | Cobertura | F-measure |
 |:-:|----------|:--------:|:---------:|:---------:|
@@ -229,13 +232,13 @@ Os resultados também são salvos em `evaluation/results.csv`.
 
 ---
 
-##  Conceitos-chave
+## 🔑 Conceitos-chave
 
 | Termo | Descrição |
 |-------|-----------|
 | `tsvector` | Representação interna do documento: radicais ordenados + pesos |
 | `tsquery` | Representação da consulta em radicais |
-| `GIN` | Índice invertido generalizado - busca em O(log N + K) |
+| `GIN` | Índice invertido generalizado — busca em O(log N + K) |
 | `ts_rank` | Função de pontuação (frequência + peso por campo) |
 | `setweight` | Atribui peso A (título) ou B (conteúdo) aos tokens |
 | Precisão | \|Relevantes ∩ Retornados\| / \|Retornados\| |
@@ -244,10 +247,9 @@ Os resultados também são salvos em `evaluation/results.csv`.
 
 ---
 
-##  Referências
+## 📚 Referências
 
-- [PostgreSQL - Chapter 12: Full Text Search](https://www.postgresql.org/docs/current/textsearch.html)
+- [PostgreSQL — Chapter 12: Full Text Search](https://www.postgresql.org/docs/current/textsearch.html)
 - [Apache Lucene](https://lucene.apache.org/)
 - [Elasticsearch](https://www.elastic.co/)
 - [Apache Solr](https://solr.apache.org/)
-                                                                                                                                                                                                                                           
