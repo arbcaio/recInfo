@@ -85,7 +85,6 @@ if (-not $psqlPath) {
         exit 1
     }
 
-    # Atualiza PATH na sessao atual apos instalacao
     $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + $env:PATH
     $psqlPath = Find-Psql
     if (-not $psqlPath) {
@@ -104,25 +103,31 @@ $env:PGPASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
     [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pgPass)
 )
 
-# ── 3. Criar banco de dados se nao existir ────────────────────
+# ── 3. Testar conexao ─────────────────────────────────────────
+Write-Step "Testando conexao com o PostgreSQL..."
+
+$connTest = & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d postgres -tAc "SELECT 1;" 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Fail "Nao foi possivel conectar. Verifique se o servico PostgreSQL esta rodando e a senha esta correta.`n  Detalhe: $connTest"
+}
+Write-Ok "Conexao OK."
+
+# ── 4. Criar banco de dados se nao existir ────────────────────
 Write-Step "Verificando banco de dados '$DbName'..."
 
-$exists = & $psqlPath -h $DbHost -p $DbPort -U $DbUser -tAc `
-    "SELECT 1 FROM pg_database WHERE datname='$DbName';" 2>&1
+$dbExists = & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d postgres -tAc `
+    "SELECT COUNT(*) FROM pg_database WHERE datname='$DbName';" 2>&1
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Fail "Nao foi possivel conectar ao PostgreSQL. Verifique se o servico esta rodando e a senha esta correta."
-}
-
-if ($exists -notmatch "1") {
+if ($dbExists.Trim() -eq "0" -or $dbExists.Trim() -eq "") {
     Write-Warn "Banco '$DbName' nao existe. Criando..."
-    & $psqlPath -h $DbHost -p $DbPort -U $DbUser -c "CREATE DATABASE $DbName;" postgres
+    & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d postgres -c "CREATE DATABASE ""$DbName"";"
+    if ($LASTEXITCODE -ne 0) { Write-Fail "Falha ao criar o banco '$DbName'." }
     Write-Ok "Banco '$DbName' criado."
 } else {
     Write-Ok "Banco '$DbName' ja existe."
 }
 
-# ── 4. Preparar o main.sql com o schema correto ───────────────
+# ── 5. Preparar o main.sql com o schema correto ───────────────
 Write-Step "Configurando schema '$SchemaName' no script SQL..."
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -137,7 +142,7 @@ if (-not (Test-Path $mainSql)) {
     Set-Content $tempSql -Encoding UTF8
 Write-Ok "Script temporario criado em: $tempSql"
 
-# ── 5. Executar o script SQL ──────────────────────────────────
+# ── 6. Executar o script SQL ──────────────────────────────────
 Write-Step "Executando main.sql no banco '$DbName'..."
 
 & $psqlPath -h $DbHost -p $DbPort -U $DbUser -d $DbName -f $tempSql
@@ -147,7 +152,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Ok "Script executado com sucesso!"
 
-# ── 6. Calcular metricas (Python) ─────────────────────────────
+# ── 7. Calcular metricas (Python) ─────────────────────────────
 Write-Step "Calculando metricas de avaliacao (Python)..."
 
 $python = Get-Command python -ErrorAction SilentlyContinue
@@ -159,7 +164,7 @@ if (-not $python) {
     Write-Ok "Metricas calculadas. Resultados em evaluation\results.csv"
 }
 
-# ── 7. Limpar ─────────────────────────────────────────────────
+# ── 8. Limpar ─────────────────────────────────────────────────
 $env:PGPASSWORD = ""
 Remove-Item $tempSql -ErrorAction SilentlyContinue
 
