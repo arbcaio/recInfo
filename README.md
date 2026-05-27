@@ -1,48 +1,67 @@
 # Recuperação da Informação em Bancos de Dados Relacionais
 
-**Discipline:** Recuperação de Informação  
+> Trabalho prático da disciplina **Recuperação de Informação** — implementação de um sistema de busca usando o módulo Full Text Search (FTS) nativo do PostgreSQL.
+
+---
+
+## 👥 Grupo
+
+| Nome | Matrícula |
+|------|-----------|
+| Agenor Luiz | — |
+| Caio Braga | — |
+| Dayvid Willams | — |
+| Luiz Anjos | — |
+| Maria Luiza | — |
+
 **Professor:** Prof. Dr. Bruno Tenório Ávila  
-**Assignment:** Aula 7 — Sistema de RI com PostgreSQL Full Text Search  
-**Deadline:** 01/06/2026 até às 19:00
+**Disciplina:** Recuperação de Informação — UFPE  
+**Entrega:** 01/06/2026 até às 19:00
 
 ---
 
-## Objective
+## 📋 Descrição
 
-Build an information retrieval system inside a PostgreSQL relational database using the native Full Text Search (FTS) module. The system must:
+O objetivo deste trabalho é criar um **sistema de recuperação da informação** dentro de um banco de dados relacional PostgreSQL, explorando o recurso nativo de *Full Text Search* (FTS).
 
-1. Store 10 documents.
-2. Perform 10 queries using the `buscar()` function.
-3. Manually identify relevant documents for each query.
-4. Calculate **Precision**, **Recall (Cobertura)**, and **F-measure** for each query.
+O sistema realiza todas as etapas clássicas de um motor de busca:
+
+1. **Aquisição** — 10 documentos em português inseridos diretamente no banco.
+2. **Representação** — cada documento é indexado como um `tsvector` com pesos diferenciados por campo (título = peso A, conteúdo = peso B).
+3. **Índice invertido** — criação de um índice GIN (*Generalized Inverted Index*) sobre o `tsvector`.
+4. **Recuperação** — função `buscar()` que converte a consulta em `tsquery`, casa com os documentos via operador `@@` e os ordena por `ts_rank`.
+5. **Avaliação** — cálculo de Precisão, Cobertura (Recall) e F-measure para cada uma das 10 consultas realizadas.
 
 ---
 
-## Project Structure
+## 🗂️ Estrutura do Projeto
 
 ```
 recInfo/
 ├── sql/
-│   ├── 01_schema.sql           # Create schema
-│   ├── 02_table_documents.sql  # Create table with tsvector column
-│   ├── 03_insert_documents.sql # Insert 10 documents
-│   ├── 04_index.sql            # Create GIN inverted index
-│   ├── 05_functions.sql        # Search helper functions
-│   ├── 06_queries.sql          # 10 queries
-│   └── main.sql                # All-in-one script
+│   ├── 01_schema.sql           # Cria o schema do grupo
+│   ├── 02_table_documents.sql  # Cria a tabela com coluna tsvector gerada
+│   ├── 03_insert_documents.sql # Insere os 10 documentos
+│   ├── 04_index.sql            # Cria o índice GIN invertido
+│   ├── 05_functions.sql        # Funções representacao_consulta() e buscar()
+│   ├── 06_queries.sql          # Executa as 10 consultas
+│   └── main.sql                # Script único (tudo em um) para o pgAdmin
 ├── evaluation/
-│   ├── relevance.json          # Manual relevance judgments
-│   ├── evaluate.py             # Metrics computation script (Python)
-│   └── results.csv             # Output from evaluate.py
-└── report/
-    └── report.md               # Final performance evaluation report
+│   ├── relevance.json          # Julgamentos de relevância manuais
+│   ├── evaluate.py             # Script Python que calcula as métricas
+│   └── results.csv             # Saída gerada pelo evaluate.py
+├── report/
+│   └── report.md               # Relatório completo com análise de desempenho
+├── .gitignore
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## How to Run
+## 🚀 Como Executar
 
-### 1. Connect to the database in pgAdmin
+### 1. Conectar ao banco via pgAdmin
 
 ```
 host:     agade.ufpe.br
@@ -52,38 +71,62 @@ username: disciplinas
 password: @g@d4
 ```
 
-### 2. Rename the schema (required — each group uses a unique schema)
+### 2. Renomear o schema
 
-Open `sql/main.sql` and replace every occurrence of `grupo` with your group name (e.g., `grupo1`).
+Abra `sql/main.sql` e substitua **todas** as ocorrências de `grupo` pelo nome do seu grupo (ex: `grupo1`).
 
-### 3. Execute the main script
+### 3. Rodar o script no pgAdmin
 
-Open `sql/main.sql` in the pgAdmin Query Tool and run it.  
-This will create the schema, table, index, functions, and run all queries.
+Abra `sql/main.sql` no *Query Tool* e execute. O script cria o schema, a tabela, o índice, as funções e roda as 10 consultas em sequência.
 
 ---
 
-## How to Calculate Metrics Locally
+## 📊 Calcular Métricas Localmente
 
-Make sure Python 3 is installed, then run:
+Requer Python 3.8+. Nenhuma dependência externa é necessária.
 
 ```bash
 python evaluation/evaluate.py
 ```
 
-Results are printed to the terminal and saved to `evaluation/results.csv`.
+Resultado impresso no terminal e salvo em `evaluation/results.csv`.
+
+### Resumo dos resultados
+
+| # | Consulta | Precisão | Cobertura | F-measure |
+|:-:|----------|:--------:|:---------:|:---------:|
+| 1 | inteligência artificial | 1,00 | 0,33 | 0,50 |
+| 2 | banco de dados | 1,00 | 0,60 | 0,75 |
+| 3 | PostgreSQL | 1,00 | 1,00 | 1,00 |
+| 4 | IA *(stop word)* | 0,00 | 0,00 | 0,00 |
+| 5 | desempenho | 1,00 | 0,67 | 0,80 |
+| 6 | segurança | 1,00 | 0,67 | 0,80 |
+| 7 | regulamentação | 1,00 | 1,00 | 1,00 |
+| 8 | machine learning | 1,00 | 1,00 | 1,00 |
+| 9 | dados | 0,80 | 0,80 | 0,80 |
+| 10 | saúde | 1,00 | 1,00 | 1,00 |
+| | **Média** | **0,88** | **0,71** | **0,76** |
 
 ---
 
-## Key Concepts
+## 🔑 Conceitos-chave
 
-| Term | Description |
-|------|-------------|
-| `tsvector` | PostgreSQL's internal representation of a document (stemmed tokens + weights) |
-| `tsquery` | Representation of a search query |
-| `GIN index` | Generalized Inverted Index — efficient for FTS |
-| `ts_rank` | Scoring function based on term frequency and weight |
-| `setweight` | Assigns weight A (title) or B (content) to tokens |
-| Precision | Proportion of retrieved documents that are relevant |
-| Recall | Proportion of relevant documents that are retrieved |
-| F-measure | Harmonic mean of Precision and Recall |
+| Termo | Descrição |
+|-------|-----------|
+| `tsvector` | Representação interna do documento: radicais ordenados + pesos |
+| `tsquery` | Representação da consulta em radicais |
+| `GIN` | Índice invertido generalizado — busca em O(log N + K) |
+| `ts_rank` | Função de pontuação (frequência + peso por campo) |
+| `setweight` | Atribui peso A (título) ou B (conteúdo) aos tokens |
+| Precisão | \|Relevantes ∩ Retornados\| / \|Retornados\| |
+| Cobertura | \|Relevantes ∩ Retornados\| / \|Relevantes\| |
+| F-measure | 2 × P × R / (P + R) |
+
+---
+
+## 📚 Referências
+
+- [PostgreSQL — Chapter 12: Full Text Search](https://www.postgresql.org/docs/current/textsearch.html)
+- [Apache Lucene](https://lucene.apache.org/)
+- [Elasticsearch](https://www.elastic.co/)
+- [Apache Solr](https://solr.apache.org/)
