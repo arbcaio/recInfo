@@ -1,0 +1,11 @@
+id,query,n_relevant,n_retrieved,TP,FP,FN,precision,recall,f_measure,notes
+1,inteligência artificial,6,2,2,0,4,1.0,0.33,0.5,"Only docs 2 and 8 spell out 'inteligência artificial' in full. Docs 6, 7, 9, 10 use the acronym 'IA', so the FTS query does not match them - classic synonym/abbreviation limitation."
+2,banco de dados,5,3,3,0,2,1.0,0.6,0.75,"Doc 3 contains 'bancos' but never 'dados'; doc 4 contains 'dados' but never 'banco'. Both miss the AND requirement of the tsquery, so they are not retrieved despite being relevant."
+3,PostgreSQL,1,1,1,0,0,1.0,1.0,1.0,Perfect match - only doc 1 mentions PostgreSQL.
+4,IA,6,0,0,0,6,0.0,0.0,0.0,"In Portuguese FTS, 'ia' is a stop word (past imperfect of 'ir'). websearch_to_tsquery returns an empty tsquery, so no documents are retrieved. This illustrates the stop-word/acronym limitation."
+5,desempenho,3,2,2,0,1,1.0,0.67,0.8,"Doc 10 is thematically relevant (AI improves medical precision/performance) but uses 'precisão', not 'desempenho', so it is not retrieved."
+6,segurança,3,2,2,0,1,1.0,0.67,0.8,"Doc 5 is about data protection and security but uses 'criptografia', 'controle de acesso', 'auditoria' - never the stem of 'segurança' - so it is missed."
+7,regulamentação,2,2,2,0,0,1.0,1.0,1.0,Both docs match perfectly. Doc 9 ranks higher because 'Regulamentação' appears in its title (weight A).
+8,machine learning,1,1,1,0,0,1.0,1.0,1.0,Perfect match - only doc 4 mentions 'machine learning'.
+9,dados,5,5,4,1,1,0.8,0.8,0.8,Doc 8 ('análise de dados') is retrieved but is not a database document - false positive. Doc 3 (MongoDB) is relevant but never uses 'dados' in its text - false negative.
+10,saúde,1,1,1,0,0,1.0,1.0,1.0,Perfect match - only doc 10 covers healthcare.

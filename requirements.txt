@@ -1,0 +1,16 @@
+# ── Runtime dependencies ─────────────────────────────────────
+# Standard library only - no third-party packages required.
+# evaluate.py uses: json, csv, os  (all built-in)
+
+# ── Optional: database connectivity ─────────────────────────
+# Uncomment if you want to run queries directly from Python
+# instead of copy-pasting SQL into pgAdmin.
+#
+# psycopg2-binary>=2.9.9
+
+# ── Optional: development / notebook exploration ─────────────
+# pandas>=2.2.0
+# jupyter>=1.0.0
+
+# ── Python version ───────────────────────────────────────────
+# Requires Python >= 3.8
