@@ -1,8 +1,8 @@
-# Relatório — Sistema de Recuperação da Informação em PostgreSQL
+# Relatório - Sistema de Recuperação da Informação em PostgreSQL
 
 **Disciplina:** Recuperação de Informação  
 **Professor:** Prof. Dr. Bruno Tenório Ávila  
-**Tarefa:** Aula 7 — Recuperação da Informação em Bancos de Dados Relacionais
+**Tarefa:** Aula 7 - Recuperação da Informação em Bancos de Dados Relacionais
 
 ---
 
@@ -57,7 +57,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q1 — `inteligência artificial`
+### Q1 - `inteligência artificial`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -72,7 +72,7 @@ F-measure (F) = 2 × P × R / (P + R)
 | 9 | Regulamentação de IA ganha força na União Europeia | ✓ | |
 | 10 | IA transforma setor de saúde | ✓ | |
 
-**Análise:** Apenas os documentos 2 e 8 grafam "inteligência artificial" por extenso. Os documentos 6, 7, 9 e 10 usam somente a sigla "IA", que não corresponde ao tsquery gerado — ilustrando a limitação com sinônimos e abreviações.
+**Análise:** Apenas os documentos 2 e 8 grafam "inteligência artificial" por extenso. Os documentos 6, 7, 9 e 10 usam somente a sigla "IA", que não corresponde ao tsquery gerado - ilustrando a limitação com sinônimos e abreviações.
 
 | TP | FP | FN | Precisão | Cobertura | F-measure |
 |:--:|:--:|:--:|:--------:|:---------:|:---------:|
@@ -80,7 +80,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q2 — `banco de dados`
+### Q2 - `banco de dados`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -95,7 +95,7 @@ F-measure (F) = 2 × P × R / (P + R)
 | 9 | Regulamentação de IA ganha força na União Europeia | | |
 | 10 | IA transforma setor de saúde | | |
 
-**Análise:** O tsquery exige a co-ocorrência de "banc" AND "dad". O documento 3 contém "bancos" mas não "dados"; o documento 4 contém "dados" mas não "banco". Ambos são relevantes mas não retornados — falsos negativos.
+**Análise:** O tsquery exige a co-ocorrência de "banc" AND "dad". O documento 3 contém "bancos" mas não "dados"; o documento 4 contém "dados" mas não "banco". Ambos são relevantes mas não retornados - falsos negativos.
 
 | TP | FP | FN | Precisão | Cobertura | F-measure |
 |:--:|:--:|:--:|:--------:|:---------:|:---------:|
@@ -103,7 +103,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q3 — `PostgreSQL`
+### Q3 - `PostgreSQL`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -117,7 +117,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q4 — `IA`
+### Q4 - `IA`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -136,7 +136,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q5 — `desempenho`
+### Q5 - `desempenho`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -144,7 +144,7 @@ F-measure (F) = 2 × P × R / (P + R)
 | 6 | OpenAI lança novos modelos mais eficientes | ✓ | ✓ |
 | 10 | IA transforma setor de saúde | ✓ | |
 
-**Análise:** O documento 10 é relevante (a IA melhora a precisão/desempenho do diagnóstico médico), porém usa o termo "precisão" em vez de "desempenho" — falso negativo por falta de sinônimos.
+**Análise:** O documento 10 é relevante (a IA melhora a precisão/desempenho do diagnóstico médico), porém usa o termo "precisão" em vez de "desempenho" - falso negativo por falta de sinônimos.
 
 | TP | FP | FN | Precisão | Cobertura | F-measure |
 |:--:|:--:|:--:|:--------:|:---------:|:---------:|
@@ -152,7 +152,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q6 — `segurança`
+### Q6 - `segurança`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -160,7 +160,7 @@ F-measure (F) = 2 × P × R / (P + R)
 | 5 | Debate sobre privacidade impacta bancos de dados | ✓ | |
 | 9 | Regulamentação de IA ganha força na União Europeia | ✓ | ✓ |
 
-**Análise:** O documento 5 trata de proteção de dados e segurança, mas utiliza os termos "criptografia", "controle de acesso" e "auditoria" — nunca o radical de "segurança". Falso negativo por falta de expansão de vocabulário.
+**Análise:** O documento 5 trata de proteção de dados e segurança, mas utiliza os termos "criptografia", "controle de acesso" e "auditoria" - nunca o radical de "segurança". Falso negativo por falta de expansão de vocabulário.
 
 | TP | FP | FN | Precisão | Cobertura | F-measure |
 |:--:|:--:|:--:|:--------:|:---------:|:---------:|
@@ -168,7 +168,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q7 — `regulamentação`
+### Q7 - `regulamentação`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -183,7 +183,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q8 — `machine learning`
+### Q8 - `machine learning`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -197,7 +197,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q9 — `dados`
+### Q9 - `dados`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -216,7 +216,7 @@ F-measure (F) = 2 × P × R / (P + R)
 
 ---
 
-### Q10 — `saúde`
+### Q10 - `saúde`
 
 | Doc | Título | Relevante | Retornado |
 |-----|--------|:---------:|:---------:|
@@ -256,7 +256,7 @@ A consulta `'IA'` não retornou nenhum resultado porque "ia" é uma *stop word* 
 **Impacto:** Cobertura = 0 para a consulta Q4, reduzindo a média geral de Cobertura para 0,71.
 
 ### 5.2 Sinônimos e Formas Alternativas (Q1, Q5, Q6)
-- `'inteligência artificial'` não recupera documentos que usam apenas "IA" — perda de 4 documentos relevantes.
+- `'inteligência artificial'` não recupera documentos que usam apenas "IA" - perda de 4 documentos relevantes.
 - `'desempenho'` não recupera o doc 10 que usa "precisão" com sentido equivalente.
 - `'segurança'` não recupera o doc 5 que usa "criptografia", "controle de acesso", "auditoria".
 
@@ -269,7 +269,7 @@ A consulta `'IA'` não retornou nenhum resultado porque "ia" é uma *stop word* 
 A consulta `'dados'` retorna o doc 8 ("análise de *dados*" no contexto de IA), que não é um documento sobre sistemas de banco de dados. O FTS não distingue o uso do termo em contextos diferentes.
 
 ### 5.5 Pontos Fortes
-- Precisão média de **0,88** — os documentos retornados são, em sua grande maioria, relevantes.
+- Precisão média de **0,88** - os documentos retornados são, em sua grande maioria, relevantes.
 - O operador `setweight` garante que correspondências no título recebam maior pontuação, melhorando a ordenação dos resultados.
 - Suporte a operadores estilo Google (`-palavra`, `"frase exata"`) via `websearch_to_tsquery`.
 
@@ -280,3 +280,4 @@ A consulta `'dados'` retorna o doc 8 ("análise de *dados*" no contexto de IA), 
 O sistema de recuperação da informação implementado com o PostgreSQL FTS demonstrou alta **precisão** (0,88 em média) e **cobertura** moderada (0,71 em média), resultando em um **F-measure médio de 0,76**.
 
 As principais limitações identificadas estão relacionadas ao tratamento de acrônimos (stop words), à ausência de expansão por sinônimos e à dependência de co-ocorrência exata de termos compostos. Essas limitações são conhecidas do FTS relacional e, para contextos de maior escala ou vocabulário mais rico, motores especializados como Elasticsearch (baseado no Apache Lucene) seriam mais adequados.
+                                    
